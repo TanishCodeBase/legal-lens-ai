@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LegalLens AI - Understand. Compare. Act.</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="logo-icon">⚖️</span>
+      <span class="logo-text">LegalLens AI</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="#" class="nav-item active" data-target="dashboard">Dashboard</a></li>
+      <li><a href="#" class="nav-item" data-target="analyze">Analyze</a></li>
+      <li><a href="#" class="nav-item" data-target="compare">Compare</a></li>
+      <li><a href="#" class="nav-item" data-target="ask">Ask AI</a></li>
+      <li><a href="#" class="nav-item" data-target="consultation">Prepare for Lawyer</a></li>
+    </ul>
+    <div class="nav-ai-badge">AI Analysis Active</div>
+  </nav>
+
+  <main class="container">
+    
+    <!-- DASHBOARD VIEW -->
+    <section id="dashboard" class="view active">
+      <div class="hero">
+        <h1>Turn complex legal documents into clear, actionable insights.</h1>
+        <p class="subtitle">Upload a document and let AI help you understand important clauses, obligations, risks, and next steps.</p>
+        <div class="hero-actions">
+          <button class="btn btn-primary btn-large" id="btn-hero-analyze">Analyze a Document</button>
+          <button class="btn btn-secondary btn-large" id="btn-hero-compare">Compare Documents</button>
+        </div>
+      </div>
+      
+      <div class="stats-area">
+        <div class="stat-card">
+          <div class="stat-value" id="stat-docs">0</div>
+          <div class="stat-label">Documents Analyzed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-clauses">0</div>
+          <div class="stat-label">Clauses Identified</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value" id="stat-questions">0</div>
+          <div class="stat-label">Questions Answered</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="action-card" data-action="analyze">
+          <h3>Analyze Document</h3>
+          <p>Extract terms, obligations, and review priorities.</p>
+        </div>
+        <div class="action-card" data-action="ask">
+          <h3>Ask Your Document</h3>
+          <p>Get grounded answers to specific questions.</p>
+        </div>
+        <div class="action-card" data-action="compare">
+          <h3>Compare Documents</h3>
+          <p>Identify substantive changes between versions.</p>
+        </div>
+        <div class="action-card" data-action="consultation">
+          <h3>Prepare for Lawyer</h3>
+          <p>Generate a structured briefing document.</p>
+        </div>
+      </div>
+      
+      <!-- Demo section -->
+      <div class="demo-section">
+        <h3>Sample Documents</h3>
+        <p>Try LegalLens AI with fictional demo documents.</p>
+        <div class="demo-docs">
+          <button class="btn btn-outline" id="btn-load-demo-1">Load Demo Lease Agreement</button>
+          <button class="btn btn-outline" id="btn-load-demo-2">Load Demo Updated Lease</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ANALYZE VIEW -->
+    <section id="analyze" class="view">
+      <div class="upload-area" id="upload-area">
+        <div class="upload-box" id="drop-zone">
+          <div class="upload-icon">📄</div>
+          <h3>Drag and drop your PDF here</h3>
+          <p>or click to browse</p>
+          <input type="file" id="file-input" accept="application/pdf" hidden>
+          <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()">Select Document</button>
+        </div>
+        <div class="upload-status" id="upload-status" hidden>
+          <div class="file-info" id="file-info"></div>
+          <button class="btn btn-primary" id="btn-start-analysis">Analyze Document</button>
+        </div>
+      </div>
+
+      <!-- Loading State -->
+      <div class="loading-state" id="analyze-loading" hidden>
+        <div class="spinner"></div>
+        <h3 id="loading-text">Reading your document...</h3>
+        <p>Powered by Gemini 2.5 Flash</p>
+      </div>
+
+      <!-- Analysis Workspace (3 columns) -->
+      <div class="workspace" id="analysis-workspace" hidden>
+        <!-- Document Viewer (Left) -->
+        <div class="workspace-col col-doc">
+          <div class="col-header">
+            <h3>DOCUMENT</h3>
+            <span class="badge badge-info" id="doc-title-badge"></span>
+          </div>
+          <div class="doc-viewer" id="doc-viewer-content">
+            <!-- Simulated document viewer for MVP -->
+            <div class="doc-placeholder">
+              <p>Document loaded.</p>
+              <p class="small text-muted">In a full implementation, a PDF.js viewer would render the document here to allow source-linking navigation.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Analysis (Center) -->
+        <div class="workspace-col col-main">
+          <div class="col-header">
+            <h3>AI ANALYSIS</h3>
+            <span class="ai-indicator">✨ Generated from document</span>
+          </div>
+          <div class="analysis-content" id="analysis-content">
+            <!-- Populated by JS -->
+          </div>
+        </div>
+
+        <!-- Insights (Right) -->
+        <div class="workspace-col col-side">
+          <div class="col-header">
+            <h3>INSIGHTS & ACTIONS</h3>
+          </div>
+          
+          <div class="score-card" id="attention-score-card">
+            <h4>AI Attention Score</h4>
+            <div class="score-value" id="attention-score">0<span class="score-max">/100</span></div>
+            <div class="score-label" id="attention-label">Low</div>
+            
+            <div class="score-breakdown">
+              <div class="breakdown-item">
+                <span class="dot dot-high"></span> <span id="count-high">0</span> High Priority
+              </div>
+              <div class="breakdown-item">
+                <span class="dot dot-medium"></span> <span id="count-medium">0</span> Review
+              </div>
+              <div class="breakdown-item">
+                <span class="dot dot-low"></span> <span id="count-info">0</span> Informational
+              </div>
+            </div>
+          </div>
+
+          <div class="next-steps" id="next-steps-container">
+            <h4>Next Steps</h4>
+            <ul class="steps-list" id="steps-list"></ul>
+          </div>
+          
+          <div class="action-buttons">
+            <button class="btn btn-outline btn-full" id="btn-goto-ask">Ask Questions</button>
+            <button class="btn btn-outline btn-full" id="btn-goto-consult">Prepare for Lawyer</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ASK AI VIEW -->
+    <section id="ask" class="view">
+      <div class="ask-container">
+        <div class="ask-header">
+          <h2>Ask Your Document</h2>
+          <p>Get answers grounded in the document you uploaded.</p>
+          <div class="ai-transparency">Model: Gemini 2.5 Flash | Grounding: Provided Document</div>
+        </div>
+        
+        <div class="chat-area" id="chat-history">
+          <div class="chat-message system-message">
+            <div class="avatar">⚖️</div>
+            <div class="message-content">
+              <p>Hello. I have analyzed your document. What would you like to know?</p>
+              <div class="suggested-questions" id="suggested-questions">
+                <!-- Populated by JS -->
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="chat-input-area">
+          <textarea id="chat-input" placeholder="Ask something about this document..." rows="1"></textarea>
+          <button class="btn btn-primary" id="btn-send-chat">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- COMPARE VIEW -->
+    <section id="compare" class="view">
+      <div class="compare-setup" id="compare-setup">
+        <h2>Compare Documents</h2>
+        <div class="compare-selectors">
+          <div class="selector-box">
+            <h3>Document A (Original)</h3>
+            <select id="select-doc-a" class="doc-select">
+              <option value="">Select a document...</option>
+            </select>
+          </div>
+          <div class="selector-box">
+            <h3>Document B (Updated)</h3>
+            <select id="select-doc-b" class="doc-select">
+              <option value="">Select a document...</option>
+            </select>
+          </div>
+        </div>
+        <button class="btn btn-primary mt-4" id="btn-run-compare" disabled>Compare Documents</button>
+      </div>
+
+      <div class="loading-state" id="compare-loading" hidden>
+        <div class="spinner"></div>
+        <h3 id="loading-text-compare">Comparing substantive changes...</h3>
+      </div>
+
+      <div class="compare-results" id="compare-results" hidden>
+        <div class="compare-header">
+          <h2>Comparison Summary</h2>
+          <p id="compare-summary-text"></p>
+          <div class="compare-stats">
+            <div class="stat-pill high">High: <span id="comp-high">0</span></div>
+            <div class="stat-pill medium">Medium: <span id="comp-med">0</span></div>
+            <div class="stat-pill low">Low: <span id="comp-low">0</span></div>
+          </div>
+        </div>
+        <div class="changes-list" id="changes-list"></div>
+      </div>
+    </section>
+
+    <!-- CONSULTATION VIEW -->
+    <section id="consultation" class="view">
+      <div class="consultation-setup" id="consultation-setup">
+        <h2>Prepare for Your Legal Consultation</h2>
+        <div class="form-group">
+          <label>Select Document:</label>
+          <select id="select-doc-consult" class="doc-select"></select>
+        </div>
+        <div class="form-group">
+          <label>What is your goal? (Optional context)</label>
+          <textarea id="consult-context" rows="3" placeholder="e.g. I am considering signing this agreement but I'm worried about the termination clause."></textarea>
+        </div>
+        <button class="btn btn-primary" id="btn-run-consult">Generate Brief</button>
+      </div>
+
+      <div class="loading-state" id="consult-loading" hidden>
+        <div class="spinner"></div>
+        <h3 id="loading-text-consult">Preparing your consultation brief...</h3>
+      </div>
+
+      <div class="consultation-brief" id="consultation-results" hidden>
+        <div class="brief-actions">
+          <button class="btn btn-outline" id="btn-print-brief">Print / Save as PDF</button>
+        </div>
+        <div class="brief-document" id="printable-brief">
+          <div class="brief-header">
+            <h2>LegalLens AI</h2>
+            <h3>Legal Consultation Preparation Brief</h3>
+          </div>
+          <div id="brief-content"></div>
+          <div class="brief-footer disclaimer-text">
+            Prepared using AI-assisted document analysis.<br>
+            This is not legal advice and does not replace a qualified legal professional.
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Global Footer -->
+  <footer class="footer">
+    <div class="disclaimer">
+      <strong>Disclaimer:</strong> LegalLens AI provides informational assistance based on the documents you provide. It does not provide legal advice, determine legal validity, or replace a qualified legal professional.
+    </div>
+  </footer>
+
+  <!-- Source Modal -->
+  <div class="modal" id="source-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Source Reference</h3>
+        <button class="close-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="source-modal-body">
+        <div class="source-meta">
+          <span class="badge" id="source-page">Page --</span>
+          <span class="badge" id="source-section">Section --</span>
+        </div>
+        <blockquote class="source-quote" id="source-quote"></blockquote>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/state.js"></script>
+  <script src="js/api.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
